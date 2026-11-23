@@ -53,6 +53,18 @@ export function createSupabaseBackend(url, key) {
       async signOut() {
         await sb.auth.signOut()
       },
+      // Enlaces de los emails (verificar cuenta y recuperar contraseña):
+      // traen ?token_hash=...&type=... y se verifican acá, así funcionan
+      // aunque el email se abra en otro navegador o en otro celular.
+      async consumeEmailLink() {
+        const q = new URLSearchParams(window.location.search)
+        const token_hash = q.get('token_hash')
+        const type = q.get('type')
+        if (!token_hash || !type) return null
+        window.history.replaceState(null, '', window.location.pathname + window.location.hash)
+        const { error } = await sb.auth.verifyOtp({ token_hash, type })
+        return { type, ok: !error }
+      },
     },
 
     async getProfile() {

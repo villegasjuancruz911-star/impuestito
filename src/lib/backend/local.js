@@ -74,6 +74,9 @@ export function createLocalBackend() {
         u.password = password
         save()
       },
+      async consumeEmailLink() {
+        return null // en modo demo no hay emails
+      },
       async signOut() {
         db.session = null
         save()

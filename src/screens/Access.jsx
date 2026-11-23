@@ -288,6 +288,41 @@ export function Recover({ direction }) {
   )
 }
 
+// Resultado de abrir el enlace del email (verificar cuenta o enlace vencido)
+export function EmailLinkResult({ direction }) {
+  const { session, emailLink, setEmailLink } = useApp()
+  const ok = emailLink?.ok
+  const isRecovery = emailLink?.type === 'recovery'
+  const go = () => setEmailLink(null) // App redirige a Inicio o a Ingresar
+
+  return (
+    <Screen surface direction={direction}>
+      <div className="content centered" style={{ gap: 16 }}>
+        {ok ? (
+          <>
+            <Round icon="check_circle" size={120} bg="var(--ok-bg)" color="var(--ok)" />
+            <h1 className="h1">¡Tu cuenta está verificada!</h1>
+            <p className="body muted" style={{ margin: 0 }}>Ya podés armar tu primer presupuesto y mandarlo por WhatsApp.</p>
+          </>
+        ) : (
+          <>
+            <Round icon="error" size={120} bg="var(--err-bg)" color="var(--err)" />
+            <h1 className="h1">El enlace no es válido</h1>
+            <p className="body muted" style={{ margin: 0 }}>
+              {isRecovery
+                ? 'Puede que haya vencido o que ya lo hayas usado. Pedí uno nuevo desde "¿Olvidaste tu contraseña?".'
+                : 'Puede que haya vencido o que ya lo hayas usado. Si ya verificaste tu cuenta, ingresá con tu email y contraseña.'}
+            </p>
+          </>
+        )}
+      </div>
+      <div className="footer">
+        <Button onClick={go}>{session ? 'Empezar' : 'Ir a ingresar'}</Button>
+      </div>
+    </Screen>
+  )
+}
+
 export function NewPassword({ direction }) {
   const { backend, setRecovery } = useApp()
   const [p1, setP1] = useState('')

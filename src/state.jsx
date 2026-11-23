@@ -9,6 +9,7 @@ export function AppProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [toast, setToast] = useState('')
   const [recovery, setRecovery] = useState(false)
+  const [emailLink, setEmailLink] = useState(null) // resultado del enlace del email: { type, ok }
 
   const loadProfile = useCallback(async () => {
     try {
@@ -20,7 +21,16 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     let alive = true
-    backend.auth.getSession().then((s) => alive && setSession(s))
+    ;(async () => {
+      const link = await backend.auth.consumeEmailLink()
+      // sin chequear "alive": el enlace se consume una sola vez y su resultado no se puede perder
+      if (link) {
+        if (link.type === 'recovery' && link.ok) setRecovery(true)
+        else setEmailLink(link)
+      }
+      const s = await backend.auth.getSession()
+      if (alive) setSession(s)
+    })()
     const off = backend.auth.onChange((event, s) => {
       if (event === 'PASSWORD_RECOVERY') setRecovery(true)
       setSession(s)
@@ -44,9 +54,11 @@ export function AppProvider({ children }) {
     reloadProfile: loadProfile,
     recovery,
     setRecovery,
+    emailLink,
+    setEmailLink,
     toast,
     notify: setToast,
-  }), [session, profile, loadProfile, recovery, toast])
+  }), [session, profile, loadProfile, recovery, emailLink, toast])
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }

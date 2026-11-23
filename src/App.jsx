@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useApp } from './state.jsx'
 import { navigate, useRoute } from './lib/router.js'
 import { Toast } from './components/ui.jsx'
-import { Login, NewPassword, Onboarding, Recover, Register, Splash, Welcome } from './screens/Access.jsx'
+import { EmailLinkResult, Login, NewPassword, Onboarding, Recover, Register, Splash, Welcome } from './screens/Access.jsx'
 import { BudgetDetail, Budgets, Clients, Home, Profile, ProfileEdit } from './screens/Main.jsx'
 import { BudgetEditor, Success } from './screens/Editor.jsx'
 
@@ -28,13 +28,15 @@ const PRIVATE = {
 }
 
 export default function App() {
-  const { session, recovery, toast, notify } = useApp()
+  const { session, recovery, emailLink, toast, notify } = useApp()
   const route = useRoute()
   const loading = session === undefined
 
   // Redirecciones según haya sesión o no
   const target = (() => {
     if (loading) return null
+    if (emailLink) return route.pattern === '/cuenta-verificada' ? null : '/cuenta-verificada'
+    if (route.pattern === '/cuenta-verificada') return session ? '/inicio' : '/ingresar'
     if (recovery) return route.pattern === '/nueva-contrasena' ? null : '/nueva-contrasena'
     if (session) return PRIVATE[route.pattern] ? null : '/inicio'
     if (PUBLIC[route.pattern]) return null
@@ -48,7 +50,7 @@ export default function App() {
   let content
   if (loading || target) content = <Splash />
   else {
-    const Screen = (session ? PRIVATE : PUBLIC)[route.pattern]
+    const Screen = route.pattern === '/cuenta-verificada' ? EmailLinkResult : (session ? PRIVATE : PUBLIC)[route.pattern]
     content = <Screen key={route.path + JSON.stringify(route.query)} params={route.params} query={route.query} direction={route.direction} />
   }
 
