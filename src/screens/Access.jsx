@@ -13,7 +13,7 @@ export function Splash() {
     <Screen className="splash fade">
       <div className="content centered" style={{ gap: 20 }}>
         <Logo size={104} light />
-        <div className="display">PresuFácil</div>
+        <div className="display">Impuestito</div>
         <div className="body">Presupuestos claros en minutos</div>
         <div style={{ height: 40 }} />
         <Spinner />
@@ -59,7 +59,7 @@ export function Welcome({ direction }) {
     <Screen surface direction={direction}>
       <div className="content centered" style={{ gap: 16 }}>
         <Logo size={84} />
-        <h1 className="h1">Bienvenido a PresuFácil</h1>
+        <h1 className="h1">Bienvenido a Impuestito</h1>
         <p className="body muted" style={{ margin: 0, maxWidth: 300 }}>Armá, guardá y compartí tus presupuestos desde el celular.</p>
         <div className="row" style={{ gap: 20, paddingTop: 24 }}>
           {[['description', 'Calcula solo'], ['share', 'PDF por WhatsApp'], ['edit', 'Fácil de editar']].map(([ic, l]) => (

@@ -1,8 +1,8 @@
 {
-  "name": "presufacil",
+  "name": "impuestito",
   "private": true,
   "version": "1.0.0",
-  "description": "PresuFácil: presupuestos claros desde el celular para trabajadores independientes",
+  "description": "Impuestito: presupuestos claros desde el celular para trabajadores independientes",
   "type": "module",
   "scripts": {
     "dev": "vite",

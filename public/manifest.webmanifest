@@ -1,14 +1,14 @@
 {
-  "name": "PresuFácil",
-  "short_name": "PresuFácil",
+  "name": "Impuestito",
+  "short_name": "Impuestito",
   "description": "Presupuestos claros en minutos, desde el celular.",
   "lang": "es-AR",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1E5AA8",
-  "theme_color": "#1E5AA8",
+  "background_color": "#587750",
+  "theme_color": "#587750",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },

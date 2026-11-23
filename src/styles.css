@@ -1,21 +1,22 @@
-/* PresuFácil · estilos (tokens del Kit UI de Figma) */
+/* Impuestito · estilos (tokens del Kit UI de Figma) */
 :root {
-  --primary: #1e5aa8;
-  --primary-pressed: #174785;
-  --primary-subtle: #e8f0fa;
-  --accent: #f2994a;
-  --accent-subtle: #fef1e6;
-  --ink: #111827;
-  --ink-2: #4b5563;
+  --primary: #587750;
+  --primary-pressed: #4a6643;
+  --primary-subtle: #e9f0e4;
+  --accent: #d9a066;
+  --accent-subtle: #f7ecdd;
+  --sent: #8a5a1c;
+  --ink: #1c2419;
+  --ink-2: #4c5a47;
   --on-primary: #ffffff;
   --disabled: #9ca3af;
-  --border: #d1d5db;
-  --border-subtle: #e5e7eb;
-  --bg: #f3f4f6;
+  --border: #d2dacb;
+  --border-subtle: #e4e9df;
+  --bg: #f3f5ef;
   --surface: #ffffff;
-  --bg-disabled: #e5e7eb;
-  --ok: #15803d;
-  --ok-bg: #dcfce7;
+  --bg-disabled: #e4e9df;
+  --ok: #1e7a3c;
+  --ok-bg: #ddf3e2;
   --warn: #b45309;
   --warn-bg: #fef3c7;
   --err: #b91c1c;
@@ -32,7 +33,7 @@
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  background: #dfe4ea;
+  background: #e1e7da;
   color: var(--ink);
   font: 16px/1.5 Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -63,7 +64,7 @@ button { cursor: pointer; }
   margin: 0 auto;
   background: var(--bg);
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 20px 60px -30px rgba(15, 30, 60, .35);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 20px 60px -30px rgba(28, 36, 25, .35);
 }
 .screen {
   position: absolute; inset: 0;
@@ -177,7 +178,7 @@ button { cursor: pointer; }
 .chip.on { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; line-height: 16px; font-weight: 700; white-space: nowrap; }
 .badge.borrador { background: var(--bg); color: var(--ink-2); }
-.badge.enviado { background: var(--primary-subtle); color: var(--primary); }
+.badge.enviado { background: var(--accent-subtle); color: var(--sent); }
 .badge.aceptado { background: var(--ok-bg); color: var(--ok); }
 .demo-tag { font-size: 11px; font-weight: 700; color: var(--warn); background: var(--warn-bg); padding: 2px 8px; border-radius: 999px; }
 
@@ -258,7 +259,7 @@ button.card:active { background: #fafafa; }
 .code-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 
 /* Vista previa del PDF */
-.pdf-preview { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; box-shadow: 0 4px 16px rgba(17, 24, 39, .12); display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.pdf-preview { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px; box-shadow: 0 4px 16px rgba(28, 36, 25, .12); display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .pdf-preview hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 4px 0; width: 100%; }
 
 /* Hoja inferior (Compartir con…) */

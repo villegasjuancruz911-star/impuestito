@@ -1,4 +1,4 @@
-# PresuFácil
+# Impuestito
 
 App web instalable (PWA) para que trabajadores independientes de Villa Regina armen, guarden y compartan presupuestos claros desde el celular: cargan materiales, cantidades, precios y mano de obra, el total se calcula solo y el PDF se comparte por WhatsApp.
 

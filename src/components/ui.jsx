@@ -1,4 +1,4 @@
-// Componentes del Kit UI de PresuFácil
+// Componentes del Kit UI de Impuestito
 import { useEffect, useRef, useState } from 'react'
 import { goBack, navigate } from '../lib/router.js'
 import { STATUS_LABEL, formatMoney, formatQty, itemSubtotal, relativeDay } from '../lib/format.js'

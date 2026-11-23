@@ -2,18 +2,18 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import { addDays, budgetNumber, formatDate, formatMoney, formatQty, itemSubtotal } from './format.js'
 
-const BLUE = rgb(30 / 255, 90 / 255, 168 / 255)
-const INK = rgb(17 / 255, 24 / 255, 39 / 255)
-const GRAY = rgb(75 / 255, 85 / 255, 99 / 255)
-const LINE = rgb(229 / 255, 231 / 255, 235 / 255)
-const SOFT = rgb(232 / 255, 240 / 255, 250 / 255)
+const BLUE = rgb(88 / 255, 119 / 255, 80 / 255) // verde musgo #587750
+const INK = rgb(28 / 255, 36 / 255, 25 / 255)
+const GRAY = rgb(76 / 255, 90 / 255, 71 / 255)
+const LINE = rgb(228 / 255, 233 / 255, 223 / 255)
+const SOFT = rgb(233 / 255, 240 / 255, 228 / 255)
 const WHITE = rgb(1, 1, 1)
 
 export async function buildBudgetPdf(budget, profile) {
   const doc = await PDFDocument.create()
   doc.setTitle(`Presupuesto ${budgetNumber(budget.number)} · ${budget.client_name}`)
-  doc.setAuthor(profile.business_name || profile.full_name || 'PresuFácil')
-  doc.setCreator('PresuFácil')
+  doc.setAuthor(profile.business_name || profile.full_name || 'Impuestito')
+  doc.setCreator('Impuestito')
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const bold = await doc.embedFont(StandardFonts.HelveticaBold)
 
@@ -132,7 +132,7 @@ export async function buildBudgetPdf(budget, profile) {
 
   // Pie
   doc.getPages().forEach((p, i, all) => {
-    p.drawText(safe(`Hecho con PresuFácil · Página ${i + 1} de ${all.length}`), { x: M, y: 28, size: 8, font, color: GRAY })
+    p.drawText(safe(`Hecho con Impuestito · Página ${i + 1} de ${all.length}`), { x: M, y: 28, size: 8, font, color: GRAY })
   })
 
   return doc.save()

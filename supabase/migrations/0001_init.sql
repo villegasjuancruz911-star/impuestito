@@ -1,4 +1,4 @@
--- PresuFácil · esquema inicial
+-- Impuestito · esquema inicial
 -- Cada trabajador ve y modifica solo sus propios datos (Row Level Security).
 
 -- Perfil del trabajador: datos que van en el encabezado del PDF
