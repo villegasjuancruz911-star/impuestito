@@ -1,0 +1,61 @@
+// Navegación y guardias de sesión
+import { useEffect } from 'react'
+import { useApp } from './state.jsx'
+import { navigate, useRoute } from './lib/router.js'
+import { Toast } from './components/ui.jsx'
+import { Login, NewPassword, Onboarding, Recover, Register, Splash, Welcome } from './screens/Access.jsx'
+import { BudgetDetail, Budgets, Clients, Home, Profile, ProfileEdit } from './screens/Main.jsx'
+import { BudgetEditor, Success } from './screens/Editor.jsx'
+
+const PUBLIC = {
+  '/onboarding': Onboarding,
+  '/bienvenida': Welcome,
+  '/ingresar': Login,
+  '/registro': Register,
+  '/recuperar': Recover,
+}
+const PRIVATE = {
+  '/inicio': Home,
+  '/presupuestos': Budgets,
+  '/presupuesto/:id': BudgetDetail,
+  '/nuevo': BudgetEditor,
+  '/editar/:id': BudgetEditor,
+  '/listo/:id': Success,
+  '/perfil': Profile,
+  '/perfil/editar': ProfileEdit,
+  '/clientes': Clients,
+  '/nueva-contrasena': NewPassword,
+}
+
+export default function App() {
+  const { session, recovery, toast, notify } = useApp()
+  const route = useRoute()
+  const loading = session === undefined
+
+  // Redirecciones según haya sesión o no
+  const target = (() => {
+    if (loading) return null
+    if (recovery) return route.pattern === '/nueva-contrasena' ? null : '/nueva-contrasena'
+    if (session) return PRIVATE[route.pattern] ? null : '/inicio'
+    if (PUBLIC[route.pattern]) return null
+    return localStorage.getItem('presufacil-onboarded') ? '/bienvenida' : '/onboarding'
+  })()
+
+  useEffect(() => {
+    if (target) navigate(target, { replace: true })
+  }, [target])
+
+  let content
+  if (loading || target) content = <Splash />
+  else {
+    const Screen = (session ? PRIVATE : PUBLIC)[route.pattern]
+    content = <Screen key={route.path + JSON.stringify(route.query)} params={route.params} query={route.query} direction={route.direction} />
+  }
+
+  return (
+    <div className="app">
+      {content}
+      <Toast message={toast} onDone={() => notify('')} />
+    </div>
+  )
+}
