@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 const routes = [
   '/onboarding', '/bienvenida', '/ingresar', '/registro', '/recuperar', '/nueva-contrasena', '/cuenta-verificada',
   '/inicio', '/presupuestos', '/presupuesto/:id', '/nuevo', '/editar/:id', '/listo/:id',
-  '/perfil', '/perfil/editar', '/clientes',
+  '/perfil', '/perfil/editar', '/perfil/accesibilidad', '/clientes',
 ]
 
 let lastDirection = 'forward'

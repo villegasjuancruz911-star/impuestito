@@ -4,7 +4,7 @@ import { useApp } from './state.jsx'
 import { navigate, useRoute } from './lib/router.js'
 import { Toast } from './components/ui.jsx'
 import { EmailLinkResult, Login, NewPassword, Onboarding, Recover, Register, Splash, Welcome } from './screens/Access.jsx'
-import { BudgetDetail, Budgets, Clients, Home, Profile, ProfileEdit } from './screens/Main.jsx'
+import { Accessibility, BudgetDetail, Budgets, Clients, Home, Profile, ProfileEdit } from './screens/Main.jsx'
 import { BudgetEditor, Success } from './screens/Editor.jsx'
 
 const PUBLIC = {
@@ -23,6 +23,7 @@ const PRIVATE = {
   '/listo/:id': Success,
   '/perfil': Profile,
   '/perfil/editar': ProfileEdit,
+  '/perfil/accesibilidad': Accessibility,
   '/clientes': Clients,
   '/nueva-contrasena': NewPassword,
 }

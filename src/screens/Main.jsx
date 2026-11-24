@@ -1,13 +1,14 @@
 // Home, Mis presupuestos, Detalle, Perfil, Editar datos y Clientes
 import { useMemo, useState } from 'react'
 import { useApp, useLoad } from '../state.jsx'
-import { navigate } from '../lib/router.js'
+import { goBack, navigate } from '../lib/router.js'
 import { TRADES, addDays, budgetNumber, formatDate, formatMoney } from '../lib/format.js'
 import {
   AppBar, Badge, BottomNav, BudgetCard, Button, Chip, Field, Icon, ItemRow, Round, Screen, Sheet,
 } from '../components/ui.jsx'
 import { ShareSheet } from '../components/ShareSheet.jsx'
 import { seedDemo } from '../lib/demo.js'
+import { loadA11y, saveA11y } from '../lib/a11y.js'
 
 function Skeletons({ n = 3 }) {
   return Array.from({ length: n }, (_, i) => <div key={i} className="skeleton" />)
@@ -48,10 +49,10 @@ export function Home({ direction }) {
         </button>
         <button className="hero" onClick={() => navigate('/nuevo')}>
           <div className="stack grow">
-            <span className="h2" style={{ color: '#fff' }}>Nuevo presupuesto</span>
-            <span className="small" style={{ color: '#fff' }}>Cliente, ítems y PDF en 3 pasos</span>
+            <span className="h2" style={{ color: 'var(--on-primary)' }}>Nuevo presupuesto</span>
+            <span className="small" style={{ color: 'var(--on-primary)' }}>Cliente, ítems y PDF en 3 pasos</span>
           </div>
-          <span className="round" style={{ background: '#fff' }}><Icon name="add" color="var(--primary)" /></span>
+          <span className="round" style={{ background: 'var(--on-primary)' }}><Icon name="add" color="var(--primary)" /></span>
         </button>
         <h2 className="h3">Resumen del mes</h2>
         <div className="row" style={{ gap: 10 }}>
@@ -235,6 +236,7 @@ export function Profile({ direction }) {
             ['Historial de presupuestos', 'description', () => navigate('/presupuestos', { replace: true })],
             ['Mis clientes', 'group', () => navigate('/clientes')],
             ['Datos para el PDF', 'edit', () => navigate('/perfil/editar')],
+            ['Accesibilidad', 'accessibility', () => navigate('/perfil/accesibilidad')],
             ['Ayuda y preguntas frecuentes', 'help', () => setHelp(true)],
             ['Cerrar sesión', 'logout', () => backend.auth.signOut()],
           ].map(([label, icon, fn]) => (
@@ -316,6 +318,58 @@ export function Clients({ direction }) {
             <span className="link">Nuevo presupuesto</span>
           </button>
         ))}
+      </div>
+    </Screen>
+  )
+}
+
+// Perfil → Accesibilidad: preferencias guardadas en este celular
+export function Accessibility({ direction }) {
+  const [prefs, setPrefs] = useState(loadA11y)
+  const set = (k, v) => {
+    const next = { ...prefs, [k]: v }
+    setPrefs(next)
+    saveA11y(next)
+  }
+  const sample = { id: 'muestra', number: 12, client_name: 'María López', description: 'Pintura living y comedor', total: 385000, status: 'enviado', created_at: new Date().toISOString() }
+  const toggles = [
+    ['dark', 'Modo oscuro', 'Fondo oscuro, cómodo de noche y con poca luz.'],
+    ['bold', 'Texto en negrita', 'Todas las letras más gruesas.'],
+    ['legible', 'Letra de alta legibilidad', 'Atkinson Hyperlegible: letras que no se confunden entre sí.'],
+    ['colorblind', 'Modo daltonismo', 'Los estados se muestran en azul y naranja en lugar de verde y rojo.'],
+  ]
+
+  return (
+    <Screen direction={direction}>
+      <AppBar title="Accesibilidad" onBack={() => goBack('/perfil')} />
+      <div className="content">
+        <div className="stack-8">
+          <span className="h3">Tamaño de letra</span>
+          <div className="chips wrap" role="radiogroup" aria-label="Tamaño de letra">
+            {[['normal', 'Normal'], ['grande', 'Grande'], ['muy-grande', 'Muy grande']].map(([v, label]) => (
+              <Chip key={v} on={prefs.size === v} role="radio" aria-checked={prefs.size === v} onClick={() => set('size', v)}>{label}</Chip>
+            ))}
+          </div>
+        </div>
+        <div>
+          {toggles.map(([k, label, hint]) => (
+            <button key={k} className="menu-row a11y-row" role="switch" aria-checked={!!prefs[k]} onClick={() => set(k, !prefs[k])}>
+              <span className="grow stack">
+                <span>{label}</span>
+                <span className="small muted">{hint}</span>
+              </span>
+              <span className={`switch ${prefs[k] ? 'on' : ''}`} aria-hidden="true"><span /></span>
+            </button>
+          ))}
+        </div>
+        <div className="stack-8">
+          <span className="h3">Vista previa</span>
+          <BudgetCard budget={sample} onClick={() => {}} />
+          <div className="row" style={{ gap: 8 }}>
+            <Badge status="borrador" /><Badge status="enviado" /><Badge status="aceptado" />
+          </div>
+        </div>
+        <p className="small muted" style={{ margin: 0 }}>Estas preferencias se guardan en este celular y se aplican en toda la app.</p>
       </div>
     </Screen>
   )

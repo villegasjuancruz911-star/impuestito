@@ -24,6 +24,7 @@ const PATHS = {
   logout: 'M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z',
   copy: 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z',
   mail: 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z',
+  accessibility: 'M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z',
   error: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z',
   whatsapp: 'M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.82 14.1c-.25.69-1.45 1.33-2 1.38-.53.05-1.03.25-3.46-.72-2.92-1.15-4.79-4.15-4.93-4.34-.14-.19-1.17-1.56-1.17-2.97 0-1.42.74-2.12 1-2.41.26-.29.57-.36.76-.36l.55.01c.18.01.41-.07.65.5.25.59.84 2.04.91 2.19.07.15.12.32.02.51-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.36 1.46.29.15.46.12.63-.07.17-.19.73-.85.92-1.15.19-.29.39-.24.65-.15.26.1 1.67.79 1.96.93.29.15.48.22.55.34.07.13.07.71-.18 1.4z',
 }
@@ -153,7 +154,7 @@ export function BottomNav({ active }) {
       {items.map(([key, label, icon, path]) =>
         key === 'nuevo' ? (
           <button key={key} aria-label="Nuevo presupuesto" onClick={() => navigate(path)}>
-            <span className="fab"><Icon name="add" color="#fff" /></span>
+            <span className="fab"><Icon name="add" color="var(--on-primary)" /></span>
           </button>
         ) : (
           <button key={key} className={active === key ? 'on' : ''} aria-current={active === key ? 'page' : undefined}
@@ -176,8 +177,8 @@ export function Round({ icon, size = 48, bg = 'var(--primary-subtle)', color = '
 
 export function Logo({ size = 84, light }) {
   return (
-    <span className="logo" style={{ width: size, height: size, borderRadius: size * 0.26, background: light ? '#fff' : 'var(--primary)' }}>
-      <Icon name="description" size={Math.round(size * 0.55)} color={light ? 'var(--primary)' : '#fff'} />
+    <span className="logo" style={{ width: size, height: size, borderRadius: size * 0.26, background: light ? 'var(--on-primary)' : 'var(--primary)' }}>
+      <Icon name="description" size={Math.round(size * 0.55)} color={light ? 'var(--primary)' : 'var(--on-primary)'} />
     </span>
   )
 }
