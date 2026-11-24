@@ -1,7 +1,7 @@
-# Accesibilidad en Impuestito — diseño
+# Accesibilidad en Presupuestito — diseño
 
 ## Para qué
-Que Impuestito se pueda usar con baja visión, daltonismo o mucho sol/poca luz, en línea con la clase 4 (diseño universal, inclusivo y equitativo). Suma para la defensa del Trabajo Final.
+Que Presupuestito se pueda usar con baja visión, daltonismo o mucho sol/poca luz, en línea con la clase 4 (diseño universal, inclusivo y equitativo). Suma para la defensa del Trabajo Final.
 
 ## Qué se hace
 - Perfil → nueva fila **"Accesibilidad"** → pantalla `/perfil/accesibilidad` con:

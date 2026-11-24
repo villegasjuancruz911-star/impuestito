@@ -6,6 +6,7 @@ import { UNITS, addDays, budgetNumber, formatDate, formatMoney, formatQty, itemS
 import { downloadPdf } from '../lib/share.js'
 import { AppBar, Button, Field, Icon, ItemRow, Logo, Round, Screen, Spinner, Stepper } from '../components/ui.jsx'
 import { ShareSheet } from '../components/ShareSheet.jsx'
+import { findItem, frequentItems, rememberItems } from '../lib/frequent.js'
 
 const EMPTY = { client_id: null, client_name: '', client_phone: '', description: '', validity_days: 15, status: 'borrador', items: [] }
 let tmpId = 0
@@ -70,6 +71,7 @@ export function BudgetEditor({ direction, params, query }) {
     setError('')
     try {
       const saved = await backend.saveBudget({ ...draft, items: draft.items })
+      rememberItems(draft.items)
       navigate(`/listo/${saved.id}${editing ? '?actualizado=1' : ''}`, { replace: true })
     } catch (e) {
       setError(e.message)
@@ -165,6 +167,13 @@ function ItemForm({ kind, onAdd, onCancel }) {
   const labor = kind === 'mano_obra'
   const [f, setF] = useState({ description: '', quantity: '1', unit: labor ? 'global' : 'u', unit_price: '' })
   const [error, setError] = useState('')
+  const [calc, setCalc] = useState(null) // { m2, manos, rend }
+  const freq = frequentItems(kind)
+  const pick = (description) => {
+    const hit = findItem(description)
+    setF(hit ? { ...f, description, unit: hit.unit, unit_price: String(hit.unit_price) } : { ...f, description })
+  }
+  const est = calc && Number(calc.rend) > 0 ? Math.ceil((Number(calc.m2) * Number(calc.manos || 1)) / Number(calc.rend) * 10) / 10 : 0
   const q = Number(String(f.quantity).replace(',', '.'))
   const p = Number(String(f.unit_price).replace(',', '.'))
   const sub = (q > 0 && p >= 0) ? q * p : 0
@@ -183,7 +192,8 @@ function ItemForm({ kind, onAdd, onCancel }) {
         <button className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Cerrar" onClick={onCancel}><Icon name="close" size={20} color="var(--ink-2)" /></button>
       </div>
       <label className="mini"><span>Descripción</span>
-        <input autoFocus placeholder={labor ? 'Ej.: Preparación y 2 manos' : 'Ej.: Látex interior 20 L'} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} />
+        <input autoFocus list={`frecuentes-${kind}`} placeholder={labor ? 'Ej.: Preparación y 2 manos' : 'Ej.: Látex interior 20 L'} value={f.description} onChange={(e) => pick(e.target.value)} />
+        <datalist id={`frecuentes-${kind}`}>{freq.map((i) => <option key={i.description} value={i.description}>{`${i.unit} · ${formatMoney(i.unit_price)}`}</option>)}</datalist>
       </label>
       <div className="grid3">
         <label className="mini"><span>Cant.</span>
@@ -196,6 +206,22 @@ function ItemForm({ kind, onAdd, onCancel }) {
           <input type="number" inputMode="decimal" min="0" step="any" placeholder="0" value={f.unit_price} onChange={(e) => setF({ ...f, unit_price: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && add()} />
         </label>
       </div>
+      {!labor && (calc ? (
+        <div className="calc">
+          <b className="small">Calcular cantidad</b>
+          <div className="grid3">
+            <label className="mini"><span>Superficie m²</span><input type="number" inputMode="decimal" min="0" step="any" value={calc.m2} onChange={(e) => setCalc({ ...calc, m2: e.target.value })} /></label>
+            <label className="mini"><span>Manos</span><input type="number" inputMode="numeric" min="1" step="1" value={calc.manos} onChange={(e) => setCalc({ ...calc, manos: e.target.value })} /></label>
+            <label className="mini"><span>Rinde m² por u.</span><input type="number" inputMode="decimal" min="0" step="any" placeholder="Ej.: 10" value={calc.rend} onChange={(e) => setCalc({ ...calc, rend: e.target.value })} /></label>
+          </div>
+          <div className="row between">
+            <span className="small">Necesitás: <b>{est ? `${String(est).replace('.', ',')} ${f.unit}` : '—'}</b></span>
+            <Button variant="secondary" className="small" disabled={!est} onClick={() => { setF({ ...f, quantity: String(est) }); setCalc(null) }}>Usar</Button>
+          </div>
+        </div>
+      ) : (
+        <button className="link small" style={{ alignSelf: 'flex-start' }} onClick={() => setCalc({ m2: '', manos: '2', rend: '' })}>¿Cuánto necesito? Calcular por m²</button>
+      ))}
       {error && <span className="err-msg small" style={{ color: 'var(--err)', fontWeight: 600 }}>⚠ {error}</span>}
       <div className="row between">
         <span className="small" style={{ fontWeight: 600 }}>Subtotal: <span className="money">{formatMoney(sub)}</span></span>
@@ -262,7 +288,7 @@ function StepReview({ draft, setDraft, total, profile, onSave, onEdit, saving, e
         <h2 className="h3">Así lo va a ver tu cliente</h2>
         <div className="pdf-preview">
           <div className="row" style={{ gap: 10 }}>
-            <Logo size={36} />
+            {profile?.logo ? <img src={profile.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8, background: '#fff' }} /> : <Logo size={36} />}
             <div className="stack grow">
               <b>{profile?.business_name || profile?.full_name || 'Tu negocio'}</b>
               <span className="muted">{[profile?.trade, profile?.phone].filter(Boolean).join(' · ')}</span>

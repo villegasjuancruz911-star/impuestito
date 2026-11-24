@@ -1,8 +1,8 @@
 {
-  "name": "impuestito",
+  "name": "presupuestito",
   "private": true,
   "version": "1.0.0",
-  "description": "Impuestito: presupuestos claros desde el celular para trabajadores independientes",
+  "description": "Presupuestito: presupuestos claros desde el celular para trabajadores independientes",
   "type": "module",
   "scripts": {
     "dev": "vite",

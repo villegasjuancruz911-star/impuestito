@@ -266,7 +266,7 @@ export function Profile({ direction }) {
 
 export function ProfileEdit({ direction }) {
   const { backend, profile, setProfile, notify } = useApp()
-  const [f, setF] = useState({ full_name: profile?.full_name || '', trade: profile?.trade || '', business_name: profile?.business_name || '', phone: profile?.phone || '' })
+  const [f, setF] = useState({ full_name: profile?.full_name || '', trade: profile?.trade || '', business_name: profile?.business_name || '', phone: profile?.phone || '', logo: profile?.logo || '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
@@ -296,6 +296,13 @@ export function ProfileEdit({ direction }) {
         </div>
         <Field label="Nombre para el presupuesto" id="pf-biz" hint="Aparece en el encabezado del PDF."><input id="pf-biz" value={f.business_name} onChange={set('business_name')} /></Field>
         <Field label="Teléfono de contacto" id="pf-phone"><input id="pf-phone" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} /></Field>
+        <Field label="Logo del negocio" id="pf-logo" hint="Opcional. Aparece en el encabezado del PDF.">
+          <div className="row" style={{ gap: 12 }}>
+            {f.logo && <img src={f.logo} alt="Logo del negocio" style={{ width: 56, height: 56, objectFit: 'contain', borderRadius: 8, background: '#fff', border: '1px solid var(--border)' }} />}
+            <input id="pf-logo" type="file" accept="image/png,image/jpeg" onChange={async (e) => { const file = e.target.files[0]; if (file) setF({ ...f, logo: await shrinkImage(file) }) }} />
+            {f.logo && <button className="link small" onClick={() => setF({ ...f, logo: '' })}>Quitar</button>}
+          </div>
+        </Field>
         {error && <div className="alert err">{error}</div>}
       </div>
       <div className="footer"><Button loading={loading} onClick={save}>Guardar cambios</Button></div>
@@ -373,4 +380,21 @@ export function Accessibility({ direction }) {
       </div>
     </Screen>
   )
+}
+
+// Achica la imagen del logo a 256 px como máximo y la devuelve en PNG (data URL)
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      const k = Math.min(1, 256 / Math.max(img.width, img.height))
+      const c = document.createElement('canvas')
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k)
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+      URL.revokeObjectURL(img.src)
+      resolve(c.toDataURL('image/png'))
+    }
+    img.onerror = reject
+    img.src = URL.createObjectURL(file)
+  })
 }

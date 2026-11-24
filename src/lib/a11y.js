@@ -1,13 +1,14 @@
 // Preferencias de accesibilidad: se guardan en este dispositivo y se aplican
 // como atributos en <html>, que el CSS usa para cambiar colores y letra.
-const KEY = 'impuestito-a11y'
+const KEY = 'presupuestito-a11y'
 
 export const DEFAULTS = { dark: false, size: 'normal', bold: false, colorblind: false, legible: false }
 export const SIZES = { normal: 1, grande: 1.15, 'muy-grande': 1.3 }
 
 export function loadA11y() {
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY) || '{}')
+    // 'impuestito-a11y': clave anterior al cambio de nombre, para no perder lo que ya eligieron
+    const saved = JSON.parse(localStorage.getItem(KEY) || localStorage.getItem('impuestito-a11y') || '{}')
     const p = { ...DEFAULTS, ...saved }
     if (!(p.size in SIZES)) p.size = DEFAULTS.size
     return p

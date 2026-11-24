@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useApp } from '../state.jsx'
 import { navigate } from '../lib/router.js'
 import { TRADES } from '../lib/format.js'
-import { AppBar, Button, Chip, Field, Icon, Logo, PasswordInput, Round, Screen, Spinner } from '../components/ui.jsx'
+import { AppBar, AppLogo, Button, Chip, Field, Icon, PasswordInput, Round, Screen, Spinner } from '../components/ui.jsx'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const passwordOk = (p) => p.length >= 8 && /[a-zA-Z]/.test(p) && /\d/.test(p)
@@ -12,8 +12,8 @@ export function Splash() {
   return (
     <Screen className="splash fade">
       <div className="content centered" style={{ gap: 20 }}>
-        <Logo size={104} light />
-        <div className="display">Impuestito</div>
+        <AppLogo size={104} />
+        <div className="display">Presupuestito</div>
         <div className="body">Presupuestos claros en minutos</div>
         <div style={{ height: 40 }} />
         <Spinner />
@@ -58,8 +58,8 @@ export function Welcome({ direction }) {
   return (
     <Screen surface direction={direction}>
       <div className="content centered" style={{ gap: 16 }}>
-        <Logo size={84} />
-        <h1 className="h1">Bienvenido a Impuestito</h1>
+        <AppLogo size={84} />
+        <h1 className="h1">Bienvenido a Presupuestito</h1>
         <p className="body muted" style={{ margin: 0, maxWidth: 300 }}>Armá, guardá y compartí tus presupuestos desde el celular.</p>
         <div className="row" style={{ gap: 20, paddingTop: 24 }}>
           {[['description', 'Calcula solo'], ['share', 'PDF por WhatsApp'], ['edit', 'Fácil de editar']].map(([ic, l]) => (

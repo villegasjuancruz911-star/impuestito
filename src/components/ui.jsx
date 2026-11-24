@@ -1,4 +1,4 @@
-// Componentes del Kit UI de Impuestito
+// Componentes del Kit UI de Presupuestito
 import { useEffect, useRef, useState } from 'react'
 import { goBack, navigate } from '../lib/router.js'
 import { STATUS_LABEL, formatMoney, formatQty, itemSubtotal, relativeDay } from '../lib/format.js'
@@ -180,6 +180,16 @@ export function Logo({ size = 84, light }) {
     <span className="logo" style={{ width: size, height: size, borderRadius: size * 0.26, background: light ? 'var(--on-primary)' : 'var(--primary)' }}>
       <Icon name="description" size={Math.round(size * 0.55)} color={light ? 'var(--primary)' : 'var(--on-primary)'} />
     </span>
+  )
+}
+
+// Logo de Presupuestito: la hoja del presupuesto con cara
+export function AppLogo({ size = 84 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label="Presupuestito" style={{ display: 'block', margin: '0 auto', borderRadius: size * 0.24, boxShadow: '0 6px 18px rgba(28, 36, 25, .18)' }}>
+      <rect width="100" height="100" rx="24" fill="#5E9E44" />
+      <g transform="rotate(-7 50 50)"><rect x="25" y="16" width="50" height="68" rx="12" fill="#FFFFFF" /><ellipse cx="41" cy="43" rx="5" ry="6" fill="#1C2419" /><ellipse cx="59" cy="43" rx="5" ry="6" fill="#1C2419" /><circle cx="42.6" cy="41" r="1.7" fill="#FFFFFF" /><circle cx="60.6" cy="41" r="1.7" fill="#FFFFFF" /><circle cx="34" cy="54" r="4" fill="#F5A524" /><circle cx="66" cy="54" r="4" fill="#F5A524" /><path d="M43 55Q50 62 57 55" fill="none" stroke="#1C2419" strokeWidth="3.5" strokeLinecap="round" /><path d="M37 72H63" stroke="#F5A524" strokeWidth="6" strokeLinecap="round" /></g>
+    </svg>
   )
 }
 

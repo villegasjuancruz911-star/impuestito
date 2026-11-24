@@ -1,6 +1,6 @@
-// Service worker de Impuestito: guarda la app para que abra rápido y sin conexión.
+// Service worker de Presupuestito: guarda la app para que abra rápido y sin conexión.
 // Los datos (Supabase) siempre van a la red.
-const CACHE = 'impuestito-v2'
+const CACHE = 'presupuestito-v3'
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']
 
 self.addEventListener('install', (e) => {

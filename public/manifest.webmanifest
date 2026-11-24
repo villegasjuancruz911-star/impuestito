@@ -1,6 +1,6 @@
 {
-  "name": "Impuestito",
-  "short_name": "Impuestito",
+  "name": "Presupuestito",
+  "short_name": "Presupuestito",
   "description": "Presupuestos claros en minutos, desde el celular.",
   "lang": "es-AR",
   "start_url": "/",

@@ -12,8 +12,8 @@ const WHITE = rgb(1, 1, 1)
 export async function buildBudgetPdf(budget, profile) {
   const doc = await PDFDocument.create()
   doc.setTitle(`Presupuesto ${budgetNumber(budget.number)} · ${budget.client_name}`)
-  doc.setAuthor(profile.business_name || profile.full_name || 'Impuestito')
-  doc.setCreator('Impuestito')
+  doc.setAuthor(profile.business_name || profile.full_name || 'Presupuestito')
+  doc.setCreator('Presupuestito')
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const bold = await doc.embedFont(StandardFonts.HelveticaBold)
 
@@ -59,10 +59,21 @@ export async function buildBudgetPdf(budget, profile) {
   // Encabezado
   const headerH = 112
   page.drawRectangle({ x: 0, y: H - headerH, width: W, height: headerH, color: BLUE })
+  // Logo del negocio (opcional), en un recuadro blanco a la izquierda
+  let tx = M
+  if (profile.logo && profile.logo.startsWith('data:image/png')) {
+    try {
+      const img = await doc.embedPng(profile.logo)
+      const k = Math.min(56 / img.width, 56 / img.height)
+      page.drawRectangle({ x: M, y: H - 92, width: 64, height: 64, color: WHITE })
+      page.drawImage(img, { x: M + 32 - (img.width * k) / 2, y: H - 60 - (img.height * k) / 2, width: img.width * k, height: img.height * k })
+      tx = M + 80
+    } catch { /* logo inválido: sigue sin logo */ }
+  }
   const business = profile.business_name || profile.full_name || 'Mi negocio'
-  text(business, M, H - 52, { size: 20, f: bold, color: WHITE })
+  text(business, tx, H - 52, { size: 20, f: bold, color: WHITE })
   const sub = [profile.trade, profile.phone].filter(Boolean).join(' · ')
-  if (sub) text(sub, M, H - 72, { size: 11, color: WHITE })
+  if (sub) text(sub, tx, H - 72, { size: 11, color: WHITE })
   text('PRESUPUESTO', W - M, H - 50, { size: 12, f: bold, color: WHITE, align: 'right' })
   text(budgetNumber(budget.number), W - M, H - 70, { size: 16, f: bold, color: WHITE, align: 'right' })
   text(`Fecha: ${formatDate(budget.updated_at || budget.created_at)}`, W - M, H - 88, { size: 10, color: WHITE, align: 'right' })
@@ -131,8 +142,15 @@ export async function buildBudgetPdf(budget, profile) {
   text(`Presupuesto válido hasta el ${formatDate(addDays(budget.updated_at || budget.created_at, budget.validity_days))} (${budget.validity_days} días).`, M, y, { size: 10, color: GRAY })
 
   // Pie
+  // Logo de Presupuestito: el mismo PNG del ícono de la app (si no se puede cargar, va solo el texto)
+  let logo = null
+  try {
+    const bytes = await fetch('/icons/icon-192.png').then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(r.status)))
+    logo = await doc.embedPng(bytes)
+  } catch { /* sin logo */ }
   doc.getPages().forEach((p, i, all) => {
-    p.drawText(safe(`Hecho con Impuestito · Página ${i + 1} de ${all.length}`), { x: M, y: 28, size: 8, font, color: GRAY })
+    if (logo) p.drawImage(logo, { x: M, y: 24, width: 13, height: 13 })
+    p.drawText(safe(`Hecho con Presupuestito · Página ${i + 1} de ${all.length}`), { x: logo ? M + 18 : M, y: 28, size: 8, font, color: GRAY })
   })
 
   return doc.save()

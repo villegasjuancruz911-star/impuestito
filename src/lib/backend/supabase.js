@@ -75,9 +75,9 @@ export function createSupabaseBackend(url, key) {
 
     async updateProfile(patch) {
       const id = await uid()
-      const { full_name, trade, business_name, phone } = patch
+      const { full_name, trade, business_name, phone, logo = '' } = patch
       return check(await sb.from('profiles')
-        .upsert({ id, full_name, trade, business_name, phone })
+        .upsert({ id, full_name, trade, business_name, phone, logo })
         .select().single())
     },
 

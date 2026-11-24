@@ -14,7 +14,7 @@
 - Textos en español rioplatense.
 - Contraste AA (4,5:1) para texto en modo oscuro y daltonismo.
 - No tocar PDF, kit UI ni base de datos.
-- Clave de localStorage: `impuestito-a11y`.
+- Clave de localStorage: `presupuestito-a11y`.
 
 ## Review Focus
 - localStorage vacío, corrupto o bloqueado → la app arranca con valores por defecto sin romperse.
