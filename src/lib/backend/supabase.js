@@ -36,6 +36,8 @@ export function createSupabaseBackend(url, key) {
           password,
           options: { data: meta, emailRedirectTo: appUrl() },
         }))
+        // Supabase no avisa si el email ya existe: devuelve un usuario sin identidades
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw Object.assign(new Error('Este email ya está registrado. Probá ingresar.'), { taken: true })
         return { needsConfirmation: !data.session }
       },
       async signIn({ email, password }) {
@@ -127,7 +129,7 @@ function translateError(msg = '') {
   const m = msg.toLowerCase()
   if (m.includes('invalid login credentials')) return 'El email o la contraseña no son correctos.'
   if (m.includes('email not confirmed')) return 'Todavía no confirmaste tu email. Revisá tu bandeja de entrada.'
-  if (m.includes('user already registered')) return 'Ya existe una cuenta con ese email. Probá ingresar.'
+  if (m.includes('user already registered')) return 'Este email ya está registrado. Probá ingresar.'
   if (m.includes('password should be at least')) return 'La contraseña tiene que tener al menos 8 caracteres.'
   if (m.includes('rate limit') || m.includes('security purposes')) return 'Hiciste muchos intentos seguidos. Esperá un minuto y volvé a probar.'
   if (m.includes('provider is not enabled')) return 'El ingreso con Google todavía no está habilitado.'

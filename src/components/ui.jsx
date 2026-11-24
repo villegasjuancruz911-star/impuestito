@@ -123,7 +123,7 @@ export function BudgetCard({ budget, onClick, dateMode = 'relative' }) {
   )
 }
 
-export function ItemRow({ item, onDelete, isNew }) {
+export function ItemRow({ item, onDelete, onEdit, isNew }) {
   return (
     <div className={`item ${isNew ? 'new' : ''}`}>
       <div className="txt">
@@ -133,8 +133,13 @@ export function ItemRow({ item, onDelete, isNew }) {
         </span>
       </div>
       <span className="money" style={{ fontWeight: 700 }}>{formatMoney(itemSubtotal(item))}</span>
+      {onEdit && (
+        <button className="icon-btn" style={{ width: 36, height: 40 }} aria-label={`Editar ${item.description}`} onClick={onEdit}>
+          <Icon name="edit" color="var(--ink-2)" size={20} />
+        </button>
+      )}
       {onDelete && (
-        <button className="icon-btn" style={{ width: 40, height: 40 }} aria-label={`Eliminar ${item.description}`} onClick={onDelete}>
+        <button className="icon-btn" style={{ width: 36, height: 40 }} aria-label={`Eliminar ${item.description}`} onClick={onDelete}>
           <Icon name="delete" color="var(--ink-2)" size={22} />
         </button>
       )}

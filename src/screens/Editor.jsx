@@ -163,9 +163,9 @@ function StepClient({ draft, setDraft, clients, onNext }) {
   )
 }
 
-function ItemForm({ kind, onAdd, onCancel }) {
+function ItemForm({ kind, onAdd, onCancel, initial }) {
   const labor = kind === 'mano_obra'
-  const [f, setF] = useState({ description: '', quantity: '1', unit: labor ? 'global' : 'u', unit_price: '' })
+  const [f, setF] = useState(initial ? { description: initial.description, quantity: String(initial.quantity), unit: initial.unit, unit_price: String(initial.unit_price) } : { description: '', quantity: '1', unit: labor ? 'global' : 'u', unit_price: '' })
   const [error, setError] = useState('')
   const [calc, setCalc] = useState(null) // { m2, manos, rend }
   const freq = frequentItems(kind)
@@ -188,7 +188,7 @@ function ItemForm({ kind, onAdd, onCancel }) {
   return (
     <div className="item-form">
       <div className="row between">
-        <b className="small" style={{ color: 'var(--primary)' }}>{labor ? 'Agregar mano de obra' : 'Agregar material'}</b>
+        <b className="small" style={{ color: 'var(--primary)' }}>{initial ? (labor ? 'Editar mano de obra' : 'Editar material') : (labor ? 'Agregar mano de obra' : 'Agregar material')}</b>
         <button className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Cerrar" onClick={onCancel}><Icon name="close" size={20} color="var(--ink-2)" /></button>
       </div>
       <label className="mini"><span>Descripción</span>
@@ -225,7 +225,7 @@ function ItemForm({ kind, onAdd, onCancel }) {
       {error && <span className="err-msg small" style={{ color: 'var(--err)', fontWeight: 600 }}>⚠ {error}</span>}
       <div className="row between">
         <span className="small" style={{ fontWeight: 600 }}>Subtotal: <span className="money">{formatMoney(sub)}</span></span>
-        <Button variant="secondary" className="small" onClick={add}>Agregar</Button>
+        <Button variant="secondary" className="small" onClick={add}>{initial ? 'Guardar' : 'Agregar'}</Button>
       </div>
     </div>
   )
@@ -241,6 +241,11 @@ function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, saving, 
     setAdding(null)
     setLocalError('')
   }
+  const [editing, setEditing] = useState(null)
+  const update = (key) => (it) => {
+    setDraft({ ...draft, items: draft.items.map((i) => (i._key === key ? { ...i, ...it } : i)) })
+    setEditing(null)
+  }
   const remove = (key) => setDraft({ ...draft, items: draft.items.filter((i) => i._key !== key) })
   const next = () => {
     if (!draft.items.length) return setLocalError('Agregá al menos un material o la mano de obra.')
@@ -254,17 +259,21 @@ function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, saving, 
         <Stepper step={2} />
         <h2 className="h3">Materiales</h2>
         <div className="stack-8">
-          {materials.map((it) => <ItemRow key={it._key} item={it} isNew={isNew(it)} onDelete={() => remove(it._key)} />)}
+          {materials.map((it) => editing === it._key
+            ? <ItemForm key={it._key} kind="material" initial={it} onAdd={update(it._key)} onCancel={() => setEditing(null)} />
+            : <ItemRow key={it._key} item={it} isNew={isNew(it)} onEdit={() => { setEditing(it._key); setAdding(null) }} onDelete={() => remove(it._key)} />)}
         </div>
         {adding === 'material' ? <ItemForm kind="material" onAdd={add} onCancel={() => setAdding(null)} /> : (
-          <button className="add-dashed" onClick={() => setAdding('material')}><Icon name="add" size={20} color="var(--primary)" /> Agregar material</button>
+          <button className="add-dashed" onClick={() => { setAdding('material'); setEditing(null) }}><Icon name="add" size={20} color="var(--primary)" /> Agregar material</button>
         )}
         <h2 className="h3">Mano de obra</h2>
         <div className="stack-8">
-          {labor.map((it) => <ItemRow key={it._key} item={it} isNew={isNew(it)} onDelete={() => remove(it._key)} />)}
+          {labor.map((it) => editing === it._key
+            ? <ItemForm key={it._key} kind="mano_obra" initial={it} onAdd={update(it._key)} onCancel={() => setEditing(null)} />
+            : <ItemRow key={it._key} item={it} isNew={isNew(it)} onEdit={() => { setEditing(it._key); setAdding(null) }} onDelete={() => remove(it._key)} />)}
         </div>
         {adding === 'mano_obra' ? <ItemForm kind="mano_obra" onAdd={add} onCancel={() => setAdding(null)} /> : (
-          <button className="add-dashed" onClick={() => setAdding('mano_obra')}><Icon name="add" size={20} color="var(--primary)" /> Agregar mano de obra</button>
+          <button className="add-dashed" onClick={() => { setAdding('mano_obra'); setEditing(null) }}><Icon name="add" size={20} color="var(--primary)" /> Agregar mano de obra</button>
         )}
         {(localError || error) && <div className="alert err" role="alert">{localError || error}</div>}
       </div>

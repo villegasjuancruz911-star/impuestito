@@ -141,12 +141,14 @@ export function Register({ direction }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [sentTo, setSentTo] = useState('')
+  const [taken, setTaken] = useState('')
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const touch = (k) => () => setTouched({ ...touched, [k]: true })
 
   const errs = {
     full_name: f.full_name.trim().length < 2 ? 'Escribí tu nombre y apellido.' : '',
     email: !EMAIL_RE.test(f.email.trim()) ? (f.email.includes('@') ? 'Revisá el email: falta el dominio.' : 'Revisá el email: falta la @.') : '',
+    ...(taken && f.email.trim().toLowerCase() === taken ? { email: 'Este email ya está registrado. Probá ingresar.' } : {}),
     password: !passwordOk(f.password) ? 'Usá al menos 8 caracteres, con letras y números.' : '',
   }
   const step1Ok = !errs.full_name && !errs.email && !errs.password
@@ -163,7 +165,9 @@ export function Register({ direction }) {
       })
       if (res.needsConfirmation) setSentTo(f.email.trim())
     } catch (err) {
-      setError(err.message)
+      if (err.taken || /registrad|already registered/i.test(err.message)) {
+        setTaken(f.email.trim().toLowerCase()); setTouched({ ...touched, email: true }); setStep(1)
+      } else setError(err.message)
     }
     setLoading(false)
   }
@@ -249,7 +253,9 @@ export function Recover({ direction }) {
       await backend.auth.resetPassword(email.trim())
       setSent(true)
     } catch (err) {
-      setError(err.message)
+      if (err.taken || /registrad|already registered/i.test(err.message)) {
+        setTaken(f.email.trim().toLowerCase()); setTouched({ ...touched, email: true }); setStep(1)
+      } else setError(err.message)
     }
     setLoading(false)
   }
@@ -341,7 +347,9 @@ export function NewPassword({ direction }) {
       await backend.auth.updatePassword(p1)
       setDone(true)
     } catch (err) {
-      setError(err.message)
+      if (err.taken || /registrad|already registered/i.test(err.message)) {
+        setTaken(f.email.trim().toLowerCase()); setTouched({ ...touched, email: true }); setStep(1)
+      } else setError(err.message)
     }
     setLoading(false)
   }

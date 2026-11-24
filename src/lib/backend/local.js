@@ -44,7 +44,7 @@ export function createLocalBackend() {
       async signUp({ email, password, meta }) {
         await delay()
         const e = email.trim().toLowerCase()
-        if (db.users.some((u) => u.email === e)) throw new Error('Ya existe una cuenta con ese email. Probá ingresar.')
+        if (db.users.some((u) => u.email === e)) throw Object.assign(new Error('Este email ya está registrado. Probá ingresar.'), { taken: true })
         const id = uuid()
         db.users.push({ id, email: e, password })
         db.profiles[id] = { id, full_name: meta.full_name || '', trade: meta.trade || '', business_name: meta.business_name || '', phone: meta.phone || '' }
