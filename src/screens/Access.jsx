@@ -2,8 +2,7 @@
 import { useState } from 'react'
 import { useApp } from '../state.jsx'
 import { navigate } from '../lib/router.js'
-import { TRADES } from '../lib/format.js'
-import { AppBar, AppLogo, Button, Chip, Field, Icon, PasswordInput, Round, Screen, Spinner } from '../components/ui.jsx'
+import { TradePicker, AppBar, AppLogo, Button, Chip, Field, Icon, PasswordInput, Round, Screen, Spinner } from '../components/ui.jsx'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const passwordOk = (p) => p.length >= 8 && /[a-zA-Z]/.test(p) && /\d/.test(p)
@@ -156,12 +155,13 @@ export function Register({ direction }) {
   const submit = async () => {
     setError('')
     if (!f.trade) return setError('Elegí a qué te dedicás.')
+    if (f.trade === 'Otro') return setError('Escribí cuál es tu rubro.')
     setLoading(true)
     try {
       const res = await backend.auth.signUp({
         email: f.email.trim(),
         password: f.password,
-        meta: { full_name: f.full_name.trim(), trade: f.trade, business_name: f.business_name.trim() || f.full_name.trim(), phone: f.phone.trim() },
+        meta: { full_name: f.full_name.trim(), trade: f.trade.trim(), business_name: f.business_name.trim() || f.full_name.trim(), phone: f.phone.trim() },
       })
       if (res.needsConfirmation) setSentTo(f.email.trim())
     } catch (err) {
@@ -202,7 +202,7 @@ export function Register({ direction }) {
               <input id="remail" type="email" inputMode="email" autoComplete="email" placeholder="carlos@gmail.com" value={f.email} onChange={set('email')} onBlur={touch('email')} />
             </Field>
             <Field label="Contraseña" id="rpass" error={touched.password && errs.password}>
-              <PasswordInput id="rpass" autoComplete="new-password" placeholder="Mínimo 8 caracteres" value={f.password} onChange={set('password')} />
+              <PasswordInput id="rpass" autoComplete="new-password" placeholder="Al menos 8 caracteres, con letras y números" value={f.password} onChange={set('password')} />
             </Field>
             {passwordOk(f.password) && <span className="ok-msg">✓ Al menos 8 caracteres, con letras y números</span>}
           </>
@@ -210,7 +210,7 @@ export function Register({ direction }) {
           <>
             <h2 className="h3">¿A qué te dedicás?</h2>
             <div className="chips wrap">
-              {TRADES.map((t) => <Chip key={t} on={f.trade === t} onClick={() => setF({ ...f, trade: t })}>{t}</Chip>)}
+              <TradePicker value={f.trade} onChange={(trade) => setF({ ...f, trade })} />
             </div>
             <Field label="Nombre para el presupuesto" id="biz" hint="Puede ser tu nombre o el de tu negocio.">
               <input id="biz" placeholder="Ej.: Pinturas Gómez" value={f.business_name} onChange={set('business_name')} />

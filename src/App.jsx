@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useApp } from './state.jsx'
 import { navigate, useRoute } from './lib/router.js'
-import { Toast } from './components/ui.jsx'
+import { BottomNav, Toast } from './components/ui.jsx'
 import { EmailLinkResult, Login, NewPassword, Onboarding, Recover, Register, Splash, Welcome } from './screens/Access.jsx'
 import { Accessibility, BudgetDetail, Budgets, Clients, Home, Profile, ProfileEdit } from './screens/Main.jsx'
 import { BudgetEditor, Success } from './screens/Editor.jsx'
@@ -55,9 +55,15 @@ export default function App() {
     content = <Screen key={route.path + JSON.stringify(route.query)} params={route.params} query={route.query} direction={route.direction} />
   }
 
+  // Barra inferior en todas las pantallas con sesión, salvo nueva contraseña
+  const showNav = !loading && !target && session && PRIVATE[route.pattern] && route.pattern !== '/nueva-contrasena'
+  const p = route.pattern
+  const active = p === '/inicio' ? 'inicio' : /^\/(presupuesto|editar|listo)/.test(p) ? 'presupuestos' : /^\/(perfil|clientes)/.test(p) ? 'perfil' : ''
+
   return (
-    <div className="app">
+    <div className={`app ${showNav ? 'with-nav' : ''}`}>
       {content}
+      {showNav && <BottomNav active={active} path={route.path} />}
       <Toast message={toast} onDone={() => notify('')} />
     </div>
   )

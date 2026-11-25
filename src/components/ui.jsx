@@ -1,7 +1,7 @@
 // Componentes del Kit UI de Presupuestito
 import { useEffect, useRef, useState } from 'react'
 import { goBack, navigate } from '../lib/router.js'
-import { STATUS_LABEL, formatMoney, formatQty, itemSubtotal, relativeDay } from '../lib/format.js'
+import { STATUS_LABEL, TRADES, budgetNumber, formatMoney, formatQty, itemSubtotal, relativeDay } from '../lib/format.js'
 
 const PATHS = {
   arrow_back: 'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
@@ -112,7 +112,7 @@ export function BudgetCard({ budget, onClick, dateMode = 'relative' }) {
         <span className="h3">{budget.client_name || 'Sin cliente'}</span>
         <span className="small muted">{budget.description || 'Sin descripción'}</span>
         <span className="caption muted" style={{ marginTop: 6 }}>
-          {dateMode === 'relative' ? relativeDay(budget.created_at) : new Date(budget.created_at).toLocaleDateString('es-AR')}
+          {budget.number ? `${budgetNumber(budget.number)} · ` : ''}{dateMode === 'relative' ? relativeDay(budget.created_at) : new Date(budget.created_at).toLocaleDateString('es-AR')}
         </span>
       </div>
       <div className="side">
@@ -147,7 +147,7 @@ export function ItemRow({ item, onDelete, onEdit, isNew }) {
   )
 }
 
-export function BottomNav({ active }) {
+export function BottomNav({ active, path: current }) {
   const items = [
     ['inicio', 'Inicio', 'home', '/inicio'],
     ['presupuestos', 'Presupuestos', 'description', '/presupuestos'],
@@ -163,12 +163,29 @@ export function BottomNav({ active }) {
           </button>
         ) : (
           <button key={key} className={active === key ? 'on' : ''} aria-current={active === key ? 'page' : undefined}
-            onClick={() => active !== key && navigate(path, { replace: true })}>
+            onClick={() => current !== path && navigate(path, { replace: true })}>
             <Icon name={icon} color={active === key ? 'var(--primary)' : 'var(--ink-2)'} />
             {label}
           </button>
         ))}
     </nav>
+  )
+}
+
+// Oficio: chips y, si elige "Otro", un campo para escribir el rubro
+export function TradePicker({ value, onChange }) {
+  const other = value === 'Otro' || (!!value && !TRADES.includes(value))
+  return (
+    <>
+      <div className="chips wrap">
+        {TRADES.map((t) => <Chip key={t} on={t === 'Otro' ? other : value === t} onClick={() => onChange(t)}>{t}</Chip>)}
+      </div>
+      {other && (
+        <Field label="¿Cuál es tu rubro?" id="trade-other">
+          <input id="trade-other" autoFocus placeholder="Ej.: Gasista, Carpintero" value={value === 'Otro' ? '' : value} onChange={(e) => onChange(e.target.value.trim() ? e.target.value : 'Otro')} />
+        </Field>
+      )}
+    </>
   )
 }
 

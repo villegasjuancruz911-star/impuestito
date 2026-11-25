@@ -2,9 +2,9 @@
 import { useMemo, useState } from 'react'
 import { useApp, useLoad } from '../state.jsx'
 import { goBack, navigate } from '../lib/router.js'
-import { TRADES, addDays, budgetNumber, formatDate, formatMoney } from '../lib/format.js'
+import { addDays, budgetNumber, formatDate, formatMoney } from '../lib/format.js'
 import {
-  AppBar, Badge, BottomNav, BudgetCard, Button, Chip, Field, Icon, ItemRow, Round, Screen, Sheet,
+  AppBar, Badge, BudgetCard, TradePicker, Button, Chip, Field, Icon, ItemRow, Round, Screen, Sheet,
 } from '../components/ui.jsx'
 import { ShareSheet } from '../components/ShareSheet.jsx'
 import { seedDemo } from '../lib/demo.js'
@@ -76,7 +76,6 @@ export function Home({ direction }) {
           ) : budgets.slice(0, 3).map((b) => <BudgetCard key={b.id} budget={b} onClick={() => navigate(`/presupuesto/${b.id}`)} />)}
         </div>
       </div>
-      <BottomNav active="inicio" />
     </Screen>
   )
 }
@@ -93,7 +92,11 @@ export function Budgets({ direction, query }) {
   const list = useMemo(() => {
     const term = q.trim().toLowerCase()
     let rows = (data || []).filter((b) => filter === 'todos' || b.status === filter)
-    if (term) rows = rows.filter((b) => `${b.client_name} ${b.description} ${b.number}`.toLowerCase().includes(term))
+    if (term) {
+      const num = term.replace(/^(n\.?\s*[º°o]?\.?\s*|#)/, '').trim()
+      rows = rows.filter((b) => `${b.client_name} ${b.description}`.toLowerCase().includes(term)
+        || (/^\d+$/.test(num) && (budgetNumber(b.number).includes(num) || String(b.number) === String(Number(num)))))
+    }
     if (sort === 'importe') rows = [...rows].sort((a, b) => b.total - a.total)
     return rows
   }, [data, filter, q, sort])
@@ -104,7 +107,7 @@ export function Budgets({ direction, query }) {
       <div className="content tight">
         <label className="search">
           <Icon name="search" size={22} color="var(--ink-2)" />
-          <input type="search" placeholder="Buscar por cliente o trabajo" value={q} onChange={(e) => setQ(e.target.value)} autoFocus={query?.buscar === '1'} aria-label="Buscar presupuestos" />
+          <input type="search" placeholder="Buscar por cliente, trabajo o N.º" value={q} onChange={(e) => setQ(e.target.value)} autoFocus={query?.buscar === '1'} aria-label="Buscar presupuestos" />
         </label>
         <div className="chips" role="group" aria-label="Filtrar por estado">
           {FILTERS.map(([k, l]) => <Chip key={k} on={filter === k} onClick={() => setFilter(k)}>{l}</Chip>)}
@@ -126,7 +129,6 @@ export function Budgets({ direction, query }) {
           ) : list.map((b) => <BudgetCard key={b.id} budget={b} dateMode="date" onClick={() => navigate(`/presupuesto/${b.id}`)} />)}
         </div>
       </div>
-      <BottomNav active="presupuestos" />
     </Screen>
   )
 }
@@ -251,7 +253,6 @@ export function Profile({ direction }) {
           <Button variant="secondary" onClick={loadDemo}>Cargar presupuestos de ejemplo</Button>
         )}
       </div>
-      <BottomNav active="perfil" />
       <Sheet open={help} onClose={() => setHelp(false)} title="Ayuda">
         <div className="stack-8 small">
           <p style={{ margin: 0 }}><b>¿Cómo armo un presupuesto?</b> Tocá el botón + y seguí los 3 pasos: cliente, ítems y revisión.</p>
@@ -274,9 +275,10 @@ export function ProfileEdit({ direction }) {
   const save = async () => {
     setError('')
     if (f.full_name.trim().length < 2) return setError('Escribí tu nombre y apellido.')
+    if (f.trade === 'Otro') return setError('Escribí cuál es tu rubro.')
     setLoading(true)
     try {
-      setProfile(await backend.updateProfile({ ...f, full_name: f.full_name.trim(), business_name: f.business_name.trim(), phone: f.phone.trim() }))
+      setProfile(await backend.updateProfile({ ...f, trade: f.trade.trim(), full_name: f.full_name.trim(), business_name: f.business_name.trim(), phone: f.phone.trim() }))
       notify('Datos guardados')
       history.back()
     } catch (e) {
@@ -292,7 +294,7 @@ export function ProfileEdit({ direction }) {
         <Field label="Nombre y apellido" id="pf-name"><input id="pf-name" value={f.full_name} onChange={set('full_name')} /></Field>
         <div className="stack-8">
           <span className="small" style={{ fontWeight: 600 }}>Oficio</span>
-          <div className="chips wrap">{TRADES.map((t) => <Chip key={t} on={f.trade === t} onClick={() => setF({ ...f, trade: t })}>{t}</Chip>)}</div>
+          <TradePicker value={f.trade} onChange={(trade) => setF({ ...f, trade })} />
         </div>
         <Field label="Nombre para el presupuesto" id="pf-biz" hint="Aparece en el encabezado del PDF."><input id="pf-biz" value={f.business_name} onChange={set('business_name')} /></Field>
         <Field label="Teléfono de contacto" id="pf-phone"><input id="pf-phone" type="tel" inputMode="tel" value={f.phone} onChange={set('phone')} /></Field>

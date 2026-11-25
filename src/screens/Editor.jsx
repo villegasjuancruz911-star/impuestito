@@ -13,7 +13,7 @@ let tmpId = 0
 const withKey = (it) => ({ ...it, _key: it.id || `n${++tmpId}` })
 
 export function BudgetEditor({ direction, params, query }) {
-  const { backend, profile } = useApp()
+  const { backend, profile, notify } = useApp()
   const editing = !!params.id
   const sourceId = params.id || query.desde
   const [draft, setDraft] = useState(null)
@@ -66,13 +66,16 @@ export function BudgetEditor({ direction, params, query }) {
     else goBack()
   }
 
-  const save = async () => {
+  const save = async (mode) => {
     setSaving(true)
     setError('')
     try {
       const saved = await backend.saveBudget({ ...draft, items: draft.items })
       rememberItems(draft.items)
-      navigate(`/listo/${saved.id}${editing ? '?actualizado=1' : ''}`, { replace: true })
+      if (mode === 'guardar') {
+        notify(editing ? 'Cambios guardados' : 'Presupuesto guardado')
+        navigate(`/presupuesto/${saved.id}`, { replace: true })
+      } else navigate(`/listo/${saved.id}${editing ? '?actualizado=1' : ''}`, { replace: true })
     } catch (e) {
       setError(e.message)
       setSaving(false)
@@ -94,12 +97,12 @@ export function BudgetEditor({ direction, params, query }) {
       {step === 1 && <StepClient draft={draft} setDraft={setDraft} clients={clients.data || []} onNext={() => setStep(2)} />}
       {step === 2 && (
         <StepItems draft={draft} setDraft={setDraft} total={total} originalKeys={editing ? originalKeys : null}
-          cta={editing ? 'Guardar cambios' : 'Siguiente: revisar'} saving={saving} error={error}
-          onNext={editing ? save : () => setStep(3)} />
+          cta={editing ? 'Guardar cambios' : 'Revisar'} saving={saving} error={error}
+          onNext={editing ? () => save('guardar') : () => setStep(3)} onKeep={editing ? null : () => save('guardar')} />
       )}
       {step === 3 && (
         <StepReview draft={draft} setDraft={setDraft} total={total} profile={profile} saving={saving} error={error}
-          onSave={save} onEdit={() => setStep(2)} />
+          onSave={() => save('pdf')} onKeep={() => save('guardar')} onEdit={() => setStep(2)} />
       )}
       {error && step === 1 && <div className="alert err" style={{ margin: '0 20px 12px' }}>{error}</div>}
     </Screen>
@@ -231,7 +234,7 @@ function ItemForm({ kind, onAdd, onCancel, initial }) {
   )
 }
 
-function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, saving, error }) {
+function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, onKeep, saving, error }) {
   const [adding, setAdding] = useState(draft.items.length === 0 ? 'material' : null)
   const [localError, setLocalError] = useState('')
   const materials = draft.items.filter((i) => i.kind === 'material')
@@ -247,9 +250,9 @@ function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, saving, 
     setEditing(null)
   }
   const remove = (key) => setDraft({ ...draft, items: draft.items.filter((i) => i._key !== key) })
-  const next = () => {
+  const next = (fn = onNext) => {
     if (!draft.items.length) return setLocalError('Agregá al menos un material o la mano de obra.')
-    onNext()
+    fn()
   }
   const isNew = (it) => originalKeys && !originalKeys.has(it._key)
 
@@ -282,13 +285,18 @@ function StepItems({ draft, setDraft, total, originalKeys, cta, onNext, saving, 
           <span className="h3">Total</span>
           <span className="h1 money" style={{ color: 'var(--primary)' }} aria-live="polite">{formatMoney(total)}</span>
         </div>
-        <Button loading={saving} onClick={next}>{cta}</Button>
+        {onKeep ? (
+          <div className="row" style={{ gap: 12 }}>
+            <Button variant="secondary" className="grow" disabled={saving} onClick={() => next(onKeep)}>Guardar</Button>
+            <Button className="grow" loading={saving} onClick={() => next()}>{cta}</Button>
+          </div>
+        ) : <Button loading={saving} onClick={() => next()}>{cta}</Button>}
       </div>
     </>
   )
 }
 
-function StepReview({ draft, setDraft, total, profile, onSave, onEdit, saving, error }) {
+function StepReview({ draft, setDraft, total, profile, onSave, onKeep, onEdit, saving, error }) {
   const today = new Date().toISOString()
   return (
     <>
@@ -329,7 +337,10 @@ function StepReview({ draft, setDraft, total, profile, onSave, onEdit, saving, e
       </div>
       <div className="footer">
         <Button loading={saving} onClick={onSave}>Generar PDF</Button>
-        <Button variant="secondary" onClick={onEdit}>Editar datos</Button>
+        <div className="row" style={{ gap: 12 }}>
+          <Button variant="secondary" className="grow" disabled={saving} onClick={onKeep}>Guardar</Button>
+          <Button variant="secondary" className="grow" onClick={onEdit}>Editar datos</Button>
+        </div>
       </div>
     </>
   )

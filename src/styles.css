@@ -270,6 +270,8 @@ button.card:active { background: var(--bg); }
 .progress2 i.on { background: var(--primary); }
 
 /* Barra inferior */
+.app.with-nav .screen { bottom: calc(72px + var(--safe-bottom)); }
+.app.with-nav > .bottomnav { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; }
 .bottomnav {
   display: grid; grid-template-columns: repeat(4, 1fr); align-items: center;
   min-height: 72px; padding: 0 8px var(--safe-bottom);
@@ -310,6 +312,8 @@ button.card:active { background: var(--bg); }
 .share-grid button { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: calc(12px * var(--fs, 1)); font-weight: 500; }
 
 /* Avisos */
+.app.with-nav .toast { bottom: calc(232px + var(--safe-bottom)); }
+#rpass::placeholder { font-size: calc(13px * var(--fs, 1)); }
 .toast {
   position: absolute; left: 16px; right: 16px; bottom: 96px; z-index: 30;
   background: var(--ink); color: var(--surface); border-radius: var(--r-md);
